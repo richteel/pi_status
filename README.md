@@ -139,7 +139,9 @@ The LED in the lighted switch will be lit when the script is running. If there i
 
 
 <hr />
+
 # 19" Rackmount Case #
+
 As stated above, the inspiration for this project was the UCTRONICS Pi Rack. While I cannot build something as elegant as the UCTRONICS Pi Rack, I wanted to do something similar. I had a 1U ABS 19" Rack Mount Case, so I decided to replicate the UCTRONICS product. Below is some information on my build.
 
 ## Materials ##
