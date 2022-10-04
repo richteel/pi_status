@@ -7,7 +7,7 @@ The inspiration for this project is from a UCTRONICS Pi Rack that [Jeff Geerling
 
 - SD1306 128x64 pixel display
 - Lighted momentary switch (Normally Open (NO))
-- 150 or 220 Ohm Resistor
+- 220 Ohm Resistor
 - Raspberry Pi 4
 
 ## Wiring ##
@@ -58,7 +58,7 @@ The inspiration for this project is from a UCTRONICS Pi Rack that [Jeff Geerling
 		<td>LED+</td>
 		<td>13</td>
 		<td>27</td>
-		<td>150 or 220 Ohm Resistor in Series</td>
+		<td>220 Ohm Resistor in Series</td>
 	</tr>
 	<tr>
 		<td>LED-</td>
@@ -136,4 +136,69 @@ Pressing and holding the switch for 10 seconds will cause the Raspberry Pi to sh
 The LED in the lighted switch will be lit when the script is running. If there is a delay from issuing the shutdown command and the script exiting, the LED will flash once every second. It is unlikely that you will see the LED flashing unless the operating system is busy with other tasks before signaling the script to terminate.
 
 **NOTE**: The screen and the switch's LED will turn off when the script ends.
-  
+
+
+<hr />
+# 19" Rackmount Case #
+As stated above, the inspiration for this project was the UCTRONICS Pi Rack. While I cannot build something as elegant as the UCTRONICS Pi Rack, I wanted to do something similar. I had a 1U ABS 19" Rack Mount Case, so I decided to replicate the UCTRONICS product. Below is some information on my build.
+
+## Materials ##
+- 19" ABS Rackmount Case 
+	- Quantity: 1
+	- Source: MPJA.COM
+	- Product Page: [https://www.mpja.com/Rack-Mount-Case-ABS-Plastic-1U/productinfo/17086+BX/](https://www.mpja.com/Rack-Mount-Case-ABS-Plastic-1U/productinfo/17086+BX/)
+- Draftboard 12" x 20" x 1/8" for mounting plate
+	- Quantity: 1
+	- Source: Glowforge
+	- Product Page: [https://shop.glowforge.com/collections/draftboard/products/draftboard](https://shop.glowforge.com/collections/draftboard/products/draftboard)
+- Clear Cast Acrylic Sheet 12" x 24" x 1/16"
+	- Quantity: 1
+	- Source: Inventables (23876-15)
+	- Product Page: [https://www.inventables.com/technologies/clear-acrylic-sheet-cast](https://www.inventables.com/technologies/clear-acrylic-sheet-cast)
+- SD1306 128x64 pixel - I2C OLED Display
+	- Quantity: 4
+	- Source: Amazon
+	- Product Page: [https://smile.amazon.com/Frienda-Display-Self-Luminous-Compatible-Raspberry/dp/B08RYSVG5Y/](https://smile.amazon.com/Frienda-Display-Self-Luminous-Compatible-Raspberry/dp/B08RYSVG5Y/)
+- Lighted Momentary Switch (Normally Open (NO))
+	- Quantity: 4
+	- Source: Amazon
+	- Product Page: [https://smile.amazon.com/gp/product/B09JLG7T98/](https://smile.amazon.com/gp/product/B09JLG7T98/)
+- 220 Ohm Resistor
+	- Quantity: 4
+	- Source: Amazon
+	- Product Page: [https://smile.amazon.com/Projects-100EP514220R-220-Resistors-Pack/dp/B0185FGNWK/](https://smile.amazon.com/Projects-100EP514220R-220-Resistors-Pack/dp/B0185FGNWK/)
+- Micro SD to Micro SD Card Extension Cable
+	- Quantity: 4
+	- Source: Amazon
+	- Product Page: [https://smile.amazon.com/gp/product/B07WWVBK8V/](https://smile.amazon.com/gp/product/B07WWVBK8V/)
+- Raspberry Pi 4
+	- Quantity: 4
+	- Source: PiShop.us
+	- Product Page: [https://www.pishop.us/product/raspberry-pi-4-model-b-1gb/](https://www.pishop.us/product/raspberry-pi-4-model-b-1gb/)
+- 2.54mm Double Row Male Header
+	- Quantity: 4 (2x7 pins ea)
+	- Source: Amazon
+	- Product Page: [https://smile.amazon.com/uxcell-Straight-Connector-Arduino-Prototype/dp/B07DJYFGHX/](https://smile.amazon.com/uxcell-Straight-Connector-Arduino-Prototype/dp/B07DJYFGHX/)
+- *(Optional)* Raspberry Pi PoE+ HAT
+	- Quantity: 4
+	- Source: PiShop.us
+	- Product Page: [https://www.pishop.us/product/raspberry-pi-poe-plus-hat/](https://www.pishop.us/product/raspberry-pi-poe-plus-hat/)
+- *(Optional)* SATA to USB Adapters
+	- Quantity: 4 (Having a difficult time fitting to case)
+	- Source: Amazon
+	- Product Page: [https://smile.amazon.com/gp/product/B00HJZJI84/](https://smile.amazon.com/gp/product/B00HJZJI84/)
+
+***NOTES***
+
+- Source and product pages are representative of items. Materials may be sourced from other vendors such as Adafruit, Digi-Key, Mouser, etc.
+- Currently (October 2022), Raspberry Pi boards are difficult to source. The situation should improve shortly. It is recommended that you use Raspberry Pi boards that you currently have or wait until they are available at approved vendors such as PiShop.us, Adafruit, Digi-Key, SparkFun, etc. You may be able to get a Raspberry Pi 4 at Amazon but it will be nearly triple the retail price. Below is the Amazon listing for a Raspberry Pi 4 with 4GB of RAM at $149.90 verses the retail price of $55 US.
+![High priced Raspberry Pi on Amazon as of 3 October 2022](Scalper_Pi_Sales.png)
+
+You may find offical retailers with Raspberry Pi boards in stock by going to [https://rpilocator.com/](https://rpilocator.com/).
+
+## Tools and Prerequisites ##
+- Laser Cutter or hand tools for cutting mounting and front plates
+- Ethernet Switch/Hub with PoE capability if using PoE+ Hat. If you plan to use PoE, your switch must support the IEEE 802.3at standard. *(See Jeff Geerling's video [Review: Raspberry Pi's new PoE+ HAT](https://youtu.be/XZ08QKAbBoU "Review: Raspberry Pi's new PoE+ HAT"))*
+
+### Laser Cutting Files ###
+There are two files located in the case folder for use with a laser cutter. The front panel will be having some changes shortly so be warned if you decide to use it that it will not fit properly. I had only 1/8" material so it is smaller to fit the case for testing. I now have 1/16" stock and will be modifying the file for the 1/16" material to fit properly in the case. I will also modify the notch for the USB to SATA adapter cable. I'm considering running them on top of the mounting plate rather than under it as it is not a good fit. If I do that, I may move the SD Card slot back to the center to avoid running it over a mounting hole.
