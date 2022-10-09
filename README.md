@@ -76,11 +76,11 @@ The inspiration for this project is from a UCTRONICS Pi Rack that [Jeff Geerling
 	- git clone https://github.com/richteel/pi_status.git
 3. Run the script on reboot
 	- sudo crontab -e
-	- Add the following line to the end of the file<br />@reboot sh /home/pi/display/launcher.sh 2>>/home/pi/display/logs/cron_err.txt 1>/home/pi/display/logs/cron_log.txt
+	- Add the following line to the end of the file<br />@reboot sh /home/pi/pi_stats/display/launcher.sh 2>>/home/pi/pi_stats/display/logs/cron_err.txt 1>/home/pi/pi_stats/display/logs/cron_log.txt
 4. Make the logs directory
-	- mkdir /home/pi/display/logs
+	- mkdir /home/pi/pi_status/logs
 5. Run the statement in the crontab to make certain that all is fine
-	- sh /home/pi/display/launcher.sh 2>>/home/pi/display/logs/cron_err.txt 1>/home/pi/display/logs/cron_log.txt &
+	- sh /home/pi/pi_stats/display/launcher.sh 2>>/home/pi/pi_stats/display/logs/cron_err.txt 1>/home/pi/pi_stats/display/logs/cron_log.txt &
 6. Reboot to see if all is working as expected
 	- sudo reboot now
 
@@ -136,6 +136,43 @@ Pressing and holding the switch for 10 seconds will cause the Raspberry Pi to sh
 The LED in the lighted switch will be lit when the script is running. If there is a delay from issuing the shutdown command and the script exiting, the LED will flash once every second. It is unlikely that you will see the LED flashing unless the operating system is busy with other tasks before signaling the script to terminate.
 
 **NOTE**: The screen and the switch's LED will turn off when the script ends.
+
+
+<hr />
+
+# Troubleshooting #
+Here are some things to try to determine what may be an issue if the display or script fails.
+
+1. Display not working and "ValueError: No I2C device at address: 0x3c" is shown in the cron_erros.txt log file 
+	- Open a terminal and type the following command:<br />
+i2cdetect -y 1<br /><br />
+If you see the following output, check your wiring to the display as the display was not found on the I2C bus.<br />
+<pre>pi@pi-one:~ $ i2cdetect -y 1
+     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+00:                         -- -- -- -- -- -- -- --
+10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+30: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+70: -- -- -- -- -- -- -- --
+pi@pi-one:~ $
+</pre><br />
+The expected output is the following showing a device was detected at address 3c,<br/>
+<pre>pi@pi-one:~ $ i2cdetect -y 1
+     0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+00:                         -- -- -- -- -- -- -- --
+10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+30: -- -- -- -- -- -- -- -- -- -- -- -- <span style=background-color:yellow">3c</span> -- -- --
+40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+70: -- -- -- -- -- -- -- --
+pi@pi-one:~ $
+</pre>
+
 
 
 <hr />
