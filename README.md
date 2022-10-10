@@ -1,5 +1,5 @@
 # pi_status #
-Add I2C SD1306 Display and Lighted Momentary Pushbutton to Raspberry Pi
+Add I2C SD1306 Display and Lighted Momentary Push-button to Raspberry Pi
 
 The inspiration for this project is from a UCTRONICS Pi Rack that [Jeff Geerling](https://youtu.be/akJ97oqmQlU "Jeff Geerling") reviewed on his YouTube channel. The UTRONICS product may be seen at [https://www.uctronics.com/cluster-and-rack-mount/for-raspberry-pi/1u-rack-mount/uctronics-pi-rack-pro-for-raspberry-pi-4b-19-1u-rack-mount-support-for-4-2-5-ssds.html](https://www.uctronics.com/cluster-and-rack-mount/for-raspberry-pi/1u-rack-mount/uctronics-pi-rack-pro-for-raspberry-pi-4b-19-1u-rack-mount-support-for-4-2-5-ssds.html).
 
@@ -69,18 +69,24 @@ The inspiration for this project is from a UCTRONICS Pi Rack that [Jeff Geerling
 </table>
 
 ## Installation ##
+***NOTES:***
+
+- The following steps make are run with the pi user account in the home directory. If running as a different user or location other than /home/pi, you will need to adjust the paths used in this document.
+- The instructions below are for verbose logging, which may result in large files that may cause the disk space to fill up and/or cause excessive writes. If this behavior is not desired, remove the "-v" flag from the launcher.sh file.
+- To capture all errors and output, with or without logging turned on, you may change the line in crontab to "sh /home/pi/pi_status/display/launcher.sh 2>>/home/pi/pi_status/display/logs/cron_err.txt 1>/home/pi/pi_status/display/logs/cron_log.txt"
+
+### Installation Steps ###
+
 1. Install Required Libraries (See [https://learn.adafruit.com/monochrome-oled-breakouts/python-setup](https://learn.adafruit.com/monochrome-oled-breakouts/python-setup))
 	- sudo pip3 install adafruit-blinka
 	- sudo pip3 install adafruit-circuitpython-ssd1306
 2. Copy files to /home/pi/display
-	- git clone https://github.com/richteel/pi_status.git
+	- git clone https://github.com/richteel/pi\_status.git
 3. Run the script on reboot
 	- sudo crontab -e
-	- Add the following line to the end of the file<br />@reboot sh /home/pi/pi_stats/display/launcher.sh 2>>/home/pi/pi_stats/display/logs/cron_err.txt 1>/home/pi/pi_stats/display/logs/cron_log.txt
-4. Make the logs directory
-	- mkdir /home/pi/pi_status/logs
+	- Add the following line to the end of the file<br />@reboot sh /home/pi/pi\_status/display/launcher.sh
 5. Run the statement in the crontab to make certain that all is fine
-	- sh /home/pi/pi_stats/display/launcher.sh 2>>/home/pi/pi_stats/display/logs/cron_err.txt 1>/home/pi/pi_stats/display/logs/cron_log.txt &
+	- sh /home/pi/pi\_status/display/launcher.sh
 6. Reboot to see if all is working as expected
 	- sudo reboot now
 
@@ -91,7 +97,7 @@ You may want to stop the script or view the output of the script. First you will
 
 You will see output similar to the following
 
-<pre>pi@pi-one:~ $ ps ax | grep 'code.py' | grep -v grep
+<pre><span style="color: green;">pi@pi-four</span>:<span style="color: blue;">~ $</span> ps ax | grep 'code.py' | grep -v grep
  403 ?        R     17:35 python3 /home/pi/display/code.py</pre>
 
 From the output, we see that the PID is 403. We may now stop the script using the following command.
@@ -104,7 +110,7 @@ We can view the error output by using the tail command.
 
 	or
 
-- sudo tail -f /home/pi/display/logs/cron_err.txt
+- sudo tail -f /home/pi/pi\_status/display/logs/error.txt
 
 We can view the standard output by using the tail command.
 
@@ -112,12 +118,84 @@ We can view the standard output by using the tail command.
 
 	or
 
-- sudo tail -f /home/pi/display/logs/cron_log.txt
+- sudo tail -f /home/pi/pi\_status/display/logs/detail.txt
+
+We can view the verbose output by using the tail command.
+
+- sudo tail -f /home/pi/pi\_status/display/logs/detail.txt
 
 **NOTE**: Use CTRL + C to exit from the tail command.
 
+You may start the script again by running the following command.
+
+- sh /home/pi/pi\_status/display/launcher.sh -v &
+
+<pre><span style="color: green;">pi@pi-four</span>:<span style="color: blue;">~ $</span> sh /home/pi/pi_status/display/launcher.sh -v &
+[2] 1974
+[1]   Exit 1                  sh /home/pi/pi_status/display/launcher.sh 2>> /home/pi/pi_status/display/logs/cron_err.txt > /home/pi/pi_status/display/logs/cron_log.txt
+<span style="color: green;">pi@pi-four</span>:<span style="color: blue;">~ $</span> 2022-10-10 18:46:17      Starting Pi Status
+2022-10-10 18:46:17     Starting Pi Status
+2022-10-10 18:46:17     Logging = True
+2022-10-10 18:46:17     Logging Verbose = True
+2022-10-10 18:46:17     Pi Status       Version 0.2     -1
+</pre>
+
+or 
+
+- sh /home/pi/pi_status/display/launcher.sh 2>>/home/pi/pi_status/display/logs/cron_err.txt 1>/home/pi/pi_status/display/logs/cron_log.txt &
+
+<pre><span style="color: green;">pi@pi-four</span>:<span style="color: blue;">~ $</span> sh /home/pi/pi_status/display/launcher.sh 2>>/home/pi/pi_status/display/logs/cron_err.txt 1>/home/pi/pi_status/display/logs/cron_log.txt &
+[1] 1931
+<span style="color: green;">pi@pi-four</span>:<span style="color: blue;">~ $</span>
+</pre>
+
 # Operation #
-The script addresses a few requirements for providing system status, script status, and shutting down of the Raspberry Pi.
+The script addresses a few requirements for providing system status, script status, and shutting down of the Raspberry Pi. There are optional parameters to control logging. Logs are written to the the logs directory within the script folder. Default location if installed in the pi user's home directory is /home/pi/pi\_status/display/logs.
+
+- -h Display help
+<pre><span style="color: green;">pi@pi-four</span>:<span style="color: blue;">~ $</span> python3 /home/pi/pi_status/display/code.py -h
+usage: code.py [-h] [-l] [-v]
+
+Raspberry Pi Status Monitor
+
+optional arguments:
+  -h, --help  show this help message and exit
+  -l          Turn on basic logging
+  -v          Allow verbose logging of status data to a file
+<span style="color: green;">pi@pi-four</span>:<span style="color: blue;">~ $</span></pre>
+- -l Default Logging
+	- Writes stdout to /home/pi/pi\_status/display/logs/status.txt
+		- Messages such as start, end, startup parameters, and information shown on OLED display 
+	- Writes stderr to /home/pi/pi\_status/display/logs/error.txt
+		- Start and end messages as well as trapped errors
+		- Will not capture error messages resulting in a crash. To capture errors from a crash, it is necessary to redirect stderr to a file by executing the script with a redirection such as code.py 2>errors.log
+	- Information from the display is logged as
+		- Line 1 (IP Address)
+		- Line 2 (Title)
+		- Line 3 (Value)
+		- Line 4 (Number of blocks to shade from 0 to 10. The value -1 indicates not to show the blocks.)
+- -v Verbose Logging (Includes Default Logging plus Details)
+	- When using the verbose option, there is no need for the logging option as the verbose option turns on the default logging option
+	- Writes to /home/pi/pi\_status/display/logs/detail.txt
+	- Produces a tab delimited file that may be imported into a spreadsheet or database
+	- Contains all data from each update at a rate of once every 10 seconds.
+		- Date and Time (local)
+		- Host Name
+		- IP Address
+		- IP Ethernet
+		- IP Wi-Fi
+		- CPU Temperature
+		- Memory Total
+		- Memory Free
+		- Memory Used
+		- Memory Percent
+		- Disk Total
+		- Disk Used
+		- Disk Free
+		- Disk Percent
+		- CPU Usage Percent 1 min
+		- CPU Usage Percent 5 min
+		- CPU Usage Percent 15 min
 
 ## Screens ##
 There are a few screens to provide system information. The screens are shown for 10 seconds each. Once the last screen is shown, the first screen is shown. The system information is refreshed before each screen is shown but is not updated while being displayed.
@@ -147,7 +225,7 @@ Here are some things to try to determine what may be an issue if the display or 
 	- Open a terminal and type the following command:<br />
 i2cdetect -y 1<br /><br />
 If you see the following output, check your wiring to the display as the display was not found on the I2C bus.<br />
-<pre>pi@pi-one:~ $ i2cdetect -y 1
+<pre><span style="color: green;">pi@pi-four</span>:<span style="color: blue;">~ $</span> i2cdetect -y 1
      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
 00:                         -- -- -- -- -- -- -- --
 10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -157,10 +235,10 @@ If you see the following output, check your wiring to the display as the display
 50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 70: -- -- -- -- -- -- -- --
-pi@pi-one:~ $
+<span style="color: green;">pi@pi-four</span>:<span style="color: blue;">~ $</span>
 </pre><br />
 The expected output is the following showing a device was detected at address 3c,<br/>
-<pre>pi@pi-one:~ $ i2cdetect -y 1
+<pre><span style="color: green;">pi@pi-four</span>:<span style="color: blue;">~ $</span> i2cdetect -y 1
      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
 00:                         -- -- -- -- -- -- -- --
 10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -170,7 +248,7 @@ The expected output is the following showing a device was detected at address 3c
 50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 70: -- -- -- -- -- -- -- --
-pi@pi-one:~ $
+<span style="color: green;">pi@pi-four</span>:<span style="color: blue;">~ $</span>
 </pre>
 
 
@@ -180,6 +258,8 @@ pi@pi-one:~ $
 # 19" Rackmount Case #
 
 As stated above, the inspiration for this project was the UCTRONICS Pi Rack. While I cannot build something as elegant as the UCTRONICS Pi Rack, I wanted to do something similar. I had a 1U ABS 19" Rack Mount Case, so I decided to replicate the UCTRONICS product. Below is some information on my build.
+
+![Finished 1U Rackmount with four Raspberry Pi 4 boards, OLED Displays and Push-button Switches](images/Homebrew_RackMount_Pis.jpg)
 
 ## Materials ##
 - 19" ABS Rackmount Case 
@@ -223,21 +303,39 @@ As stated above, the inspiration for this project was the UCTRONICS Pi Rack. Whi
 	- Source: PiShop.us
 	- Product Page: [https://www.pishop.us/product/raspberry-pi-poe-plus-hat/](https://www.pishop.us/product/raspberry-pi-poe-plus-hat/)
 - *(Optional)* SATA to USB Adapters
-	- Quantity: 4 (Having a difficult time fitting to case)
+	- Quantity: 1 to 4 (Having a difficult time fitting to case)
 	- Source: Amazon
 	- Product Page: [https://smile.amazon.com/gp/product/B00HJZJI84/](https://smile.amazon.com/gp/product/B00HJZJI84/)
+- *(Optional)* 2.5" SSD
+	- Quantity: 1 to 4 (Having a difficult time fitting to case)
+	- Source: Amazon
+	- Product Page: [https://smile.amazon.com/SAMSUNG-500GB-Internal-MZ-77E500B-AM/dp/B08QBMD6P4/](https://smile.amazon.com/SAMSUNG-500GB-Internal-MZ-77E500B-AM/dp/B08QBMD6P4/)
+- *(Optional)* M.2 NVME SSD Enclosure Adapter
+	- Quantity: 1 to 4 (Can only fit 3 in the case)
+	- Source: Amazon
+	- Product Page: [https://smile.amazon.com/gp/product/B07MNFH1PX/](https://smile.amazon.com/gp/product/B07MNFH1PX/)
+- *(Optional)* NVMe M.2 SSD
+	- Quantity: 1 to 4 (Can only fit 3 in the case)
+	- Source: Amazon
+	- Product Page: [https://smile.amazon.com/gp/product/B082BWY2C2/](https://smile.amazon.com/gp/product/B082BWY2C2/)
 
 ***NOTES***
 
 - Source and product pages are representative of items. Materials may be sourced from other vendors such as Adafruit, Digi-Key, Mouser, etc.
-- Currently (October 2022), Raspberry Pi boards are difficult to source. The situation should improve shortly. It is recommended that you use Raspberry Pi boards that you currently have or wait until they are available at approved vendors such as PiShop.us, Adafruit, Digi-Key, SparkFun, etc. You may be able to get a Raspberry Pi 4 at Amazon but it will be nearly triple the retail price. Below is the Amazon listing for a Raspberry Pi 4 with 4GB of RAM at $149.90 verses the retail price of $55 US.
-![High priced Raspberry Pi on Amazon as of 3 October 2022](Scalper_Pi_Sales.png)
+- Currently (October 2022), Raspberry Pi boards are difficult to source. The situation should improve shortly. It is recommended that you use Raspberry Pi boards that you currently have or wait until they are available at approved vendors such as PiShop.us, Adafruit, Digi-Key, SparkFun, etc. You may be able to get a Raspberry Pi 4 at Amazon but it will be nearly triple the retail price. Below is the Amazon listing for a Raspberry Pi 4 with 4GB of RAM at $149.90 verses the retail price of $55 US.<br />
+![High priced Raspberry Pi on Amazon as of 3 October 2022](images/Scalper_Pi_Sales.png)
 
-You may find offical retailers with Raspberry Pi boards in stock by going to [https://rpilocator.com/](https://rpilocator.com/).
+You may find official retailers with Raspberry Pi boards in stock by going to [https://rpilocator.com/](https://rpilocator.com/).
 
 ## Tools and Prerequisites ##
 - Laser Cutter or hand tools for cutting mounting and front plates
 - Ethernet Switch/Hub with PoE capability if using PoE+ Hat. If you plan to use PoE, your switch must support the IEEE 802.3at standard. *(See Jeff Geerling's video [Review: Raspberry Pi's new PoE+ HAT](https://youtu.be/XZ08QKAbBoU "Review: Raspberry Pi's new PoE+ HAT"))*
 
 ### Laser Cutting Files ###
-There are two files located in the case folder for use with a laser cutter. The front panel will be having some changes shortly so be warned if you decide to use it that it will not fit properly. I had only 1/8" material so it is smaller to fit the case for testing. I now have 1/16" stock and will be modifying the file for the 1/16" material to fit properly in the case. I will also modify the notch for the USB to SATA adapter cable. I'm considering running them on top of the mounting plate rather than under it as it is not a good fit. If I do that, I may move the SD Card slot back to the center to avoid running it over a mounting hole.
+There are two files located in the case folder for use with a laser cutter. <span style="text-decoration: line-through">The front panel will be having some changes shortly so be warned if you decide to use it that it will not fit properly. I had only 1/8" material so it is smaller to fit the case for testing. I now have 1/16" stock and will be modifying the file for the 1/16" material to fit properly in the case. I will also modify the notch for the USB to SATA adapter cable. I'm considering running them on top of the mounting plate rather than under it as it is not a good fit. If I do that, I may move the SD Card slot back to the center to avoid running it over a mounting hole.</span>
+
+The base was made with 1/8" draftboard. The outline for the Raspberry Pi's were scored while the rest was cut.
+![Glowforge Application Screenshot of the Base](images/Glowforge_Base0.png)
+
+The front was cut from the 1/16" clear acrylic. All layers were cut.
+![Glowforge Application Screenshot of the Front](images/Glowforge_Front.png)

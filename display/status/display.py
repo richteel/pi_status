@@ -1,29 +1,32 @@
 import time
 import board
-import digitalio
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
 
+
 class display(object):
-    def __init__(self):
+    def __init__(self, log):
+        self.log = log
+
         self.screen = None
 
         self.width = 128
         self.height = 64
         self.i2cAddr = 0x3C
 
-        self.initialize()
-
         self.titleFont = self.getFont(12)
         self.infoFont = self.getFont(14)
+
+        self.initialize()
 
     def initialize(self):
         # Use for I2C.
         self.i2c = board.I2C()
-        self.oled = adafruit_ssd1306.SSD1306_I2C(self.width, self.height, self.i2c, addr=self.i2cAddr)
+        self.oled = adafruit_ssd1306.SSD1306_I2C(
+            self.width, self.height, self.i2c, addr=self.i2cAddr)
 
         self.clearScreen()
-    
+
     # Clear display.
     def clearScreen(self):
         self.oled.fill(0)
@@ -42,10 +45,10 @@ class display(object):
             # For Linux
             font = ImageFont.truetype("DejaVuSans.ttf", fontSize)
         except Exception:
-            print("Pi Status ->\t{0}".format("No font DejaVuSans; use default instead"), flush=True)
+            self.log.log_print("No font DejaVuSans; use default instead")
             # For others
             font = ImageFont.load_default()
-        
+
         return font
 
     def getTimeString(self):
@@ -53,10 +56,11 @@ class display(object):
         t = time.strftime("%Y-%m-%d %H:%M:%S", s)
 
         return t
-    
+
     def updateDisplay(self, title, valueTitle, valueText, value, centerTitle=False):
         t = self.getTimeString()
-        print("Pi Status Update ->\t{0}\t{1}\t{2}\t{3}\t{4:.0f}".format(t, title, valueTitle, valueText, value), flush=True)
+        self.log.log_print(title, valueTitle, valueText,
+                           "{0:.0f}".format(value))
         # Clear the screen
         self.clearScreen()
 
@@ -98,11 +102,12 @@ class display(object):
             x = (self.oled.width - 100) // 2
             for i in range(10):
                 if i < value:
-                    self.draw.rectangle((x, 50, x+6, 63), outline=255, fill=255)
+                    self.draw.rectangle(
+                        (x, 50, x+6, 63), outline=255, fill=255)
                 else:
                     # self.draw.line([(x, 63), (x+6, 63)], fill=255, width=1)
                     self.draw.rectangle((x, 50, x+6, 63), outline=255, fill=0)
-                
+
                 x += 10
 
         # Display image

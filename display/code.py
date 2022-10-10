@@ -1,15 +1,46 @@
-import signal
 import time
 import board
 import digitalio
 import os
 import sys
+import argparse
 
 from status import display
 from status import system
 from status import GracefulKiller
+from status import log
 
-disp = display.display()
+version_number = "0.2"
+updateFreq = 10  # Time in seconds
+currentIndex = 99
+displayItems = ["NAME", "RAM", "TEMP", "DISK", "CPU"]
+
+script_path = os.path.realpath(os.path.dirname(__file__))
+logs_path = os.path.join(script_path, "logs")
+verbose_file = None
+stdout_file = None
+stderr_file = None
+
+parser = argparse.ArgumentParser(description="Raspberry Pi Status Monitor")
+parser.add_argument("-l", help="Turn on basic logging",
+                    dest="logging", action="store_true")
+parser.add_argument("-v", help="Allow verbose logging of status data to a file",
+                    dest="verbose", action="store_true")
+args = parser.parse_args()
+
+if args.logging or args.verbose:
+    stdout_file = os.path.realpath(os.path.join(logs_path, "status.txt"))
+    stderr_file = os.path.realpath(
+        os.path.join(logs_path, "error.txt"))
+
+if args.verbose:
+    verbose_file = os.path.realpath(
+        os.path.join(logs_path, "detail.txt"))
+
+status_log = log.log(log_file=stdout_file,
+                     err_file=stderr_file, verbose_file=verbose_file)
+
+disp = display.display(status_log)
 hw = system.hw_info()
 led = digitalio.DigitalInOut(board.D27)
 led.direction = digitalio.Direction.OUTPUT
@@ -19,21 +50,19 @@ button.pull = digitalio.Pull.UP
 
 led.value = True
 
-updateFreq = 10  # Time in seconds
-currentIndex = 99
-displayItems = ["NAME", "RAM", "TEMP", "DISK", "CPU"]
-
 t = disp.getTimeString()
-print("\r\nPi Status ->\t{0}\t{1}".format(t, "Starting Pi Status"), flush=True)
-print("\nPi Status ->\t{0}\t{1}".format(t, "Starting Pi Status"), file=sys.stderr, flush=True)
+status_log.log_print("Starting Pi Status")
+status_log.err_print("Starting Pi Status")
+status_log.log_print("Logging = {0}".format(bool(stdout_file)))
+status_log.log_print("Logging Verbose = {0}".format(bool(verbose_file)))
 
 # Show Splash Screen
-disp.updateDisplay("Pi Status", "Version", "0.1", -1, True)
+disp.updateDisplay("Pi Status", "Version", version_number, -1, True)
 
 # Allow clean exit when stopping
 # REF: https://stackoverflow.com/questions/18499497/how-to-process-sigterm-signal-gracefully
 killer = GracefulKiller.GracefulKiller()
- 
+
 timer = time.time()
 
 shutdownFlag = False
@@ -41,20 +70,29 @@ buttonPressedTime = time.time()
 blinkTimer = time.time()
 lastButtonState = False
 
+status_log.verbose_print("Host Name", "IP Address",
+                         "IP Ethernet", "IP Wi-Fi",
+                         "CPU Temperature",
+                         "Memory Total", "Memory Free", "Memory Used", "Memory Percent",
+                         "Disk Total", "Disk Used", "Disk Free", "Disk Percent",
+                         "CPU Usage Percent 1 min", "CPU Usage Percent 5 min", "CPU Usage Percent 15 min")
+
 while not killer.kill_now:
     if not button.value:
         if not lastButtonState:
             t = disp.getTimeString()
-            print("Pi Status Button ->\t{0}\t{1}".format(t, "Button Pressed"), flush=True)
+            status_log.log_print("Button Pressed")
             lastButtonState = True
             buttonPressedTime = time.time()
         elif time.time() > buttonPressedTime + 10:
             if not shutdownFlag:
                 shutdownFlag = True
                 t = disp.getTimeString()
-                print("Pi Status Button ->\t{0}\t{1}".format(t, "Shutting Down"), flush=True)
+                status_log.log_print("Shutting Down")
                 os.system("/usr/sbin/shutdown now -h")
     else:
+        if lastButtonState:
+            status_log.log_print("Button Released")
         lastButtonState = False
 
     if shutdownFlag:
@@ -66,8 +104,15 @@ while not killer.kill_now:
     if time.time() > timer + updateFreq:
         if currentIndex >= len(displayItems):
             currentIndex = 0
-        
+
         hw.update()
+
+        status_log.verbose_print(hw.hostname, hw.ipaddress,
+                                 hw.ip_eth0, hw.ip_wlan0,
+                                 hw.cpuTemperature,
+                                 hw.memTotal, hw.memFree, hw.memUsed, hw.memPercent,
+                                 hw.diskTotal, hw.diskUsed, hw.diskFree, hw.diskPercent,
+                                 hw.cpuUsagePercent_1, hw.cpuUsagePercent_5, hw.cpuUsagePercent_15)
 
         ipAddress = "IP: {0}".format(hw.ipaddress)
         valTitle = displayItems[currentIndex]
@@ -83,7 +128,8 @@ while not killer.kill_now:
             valValue = round(hw.memPercent / 10)
         elif valTitle.upper() == "TEMP":
             valText = "{0:.2f} C".format(hw.cpuTemperature)
-            valValue = round((hw.cpuTemperature + 40) / 12.5) # Offically works from -40 to 85 C [ 12.5 = (85 + 40)/10 ]
+            # Offically works from -40 to 85 C [ 12.5 = (85 + 40)/10 ]
+            valValue = round((hw.cpuTemperature + 40) / 12.5)
         elif valTitle.upper() == "DISK":
             valTitle = valTitle + " ({0:.0f} GB)".format(hw.diskTotalGB)
             valText = "{0:.2f} %".format(hw.diskPercent)
@@ -104,6 +150,6 @@ while not killer.kill_now:
 disp.clearScreen()
 led.value = False
 t = disp.getTimeString()
-print("\r\nPi Status ->\t{0}\t{1}".format(t, "\nExiting from Pi Status"), flush=True)
-print("Pi Status ->\t{0}\t{1}\n".format(t, "Exiting from Pi Status"), file=sys.stderr, flush=True)
+status_log.log_print("Exiting from Pi Status")
+status_log.err_print("Exiting from Pi Status")
 exit(1)
