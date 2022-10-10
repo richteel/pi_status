@@ -98,7 +98,7 @@ You may want to stop the script or view the output of the script. First you will
 You will see output similar to the following
 
 <pre><span style="color: green;">pi@pi-four</span>:<span style="color: blue;">~ $</span> ps ax | grep 'code.py' | grep -v grep
- 403 ?        R     17:35 python3 /home/pi/display/code.py</pre>
+ 403 ?        R     17:35 python3 /home/pi/pi\_status/display/code.py</pre>
 
 From the output, we see that the PID is 403. We may now stop the script using the following command.
 
