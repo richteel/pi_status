@@ -81,7 +81,7 @@ The inspiration for this project is from a UCTRONICS Pi Rack that [Jeff Geerling
 	- sudo pip3 install adafruit-blinka
 	- sudo pip3 install adafruit-circuitpython-ssd1306
 2. Copy files to /home/pi/display
-	- git clone https://github.com/richteel/pi\_status.git
+	- git clone https://github.com/richteel/pi_status.git
 3. Run the script on reboot
 	- sudo crontab -e
 	- Add the following line to the end of the file<br />@reboot sh /home/pi/pi\_status/display/launcher.sh
