@@ -80,7 +80,7 @@ The inspiration for this project is from a UCTRONICS Pi Rack that [Jeff Geerling
 1. Install Required Libraries (See [https://learn.adafruit.com/monochrome-oled-breakouts/python-setup](https://learn.adafruit.com/monochrome-oled-breakouts/python-setup))
 	- sudo pip3 install adafruit-blinka
 	- sudo pip3 install adafruit-circuitpython-ssd1306
-2. Copy files to /home/pi/display
+2. Clone the files from GitHub
 	- git clone https://github.com/richteel/pi_status.git
 3. Run the script on reboot
 	- sudo crontab -e
