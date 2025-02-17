@@ -76,21 +76,158 @@ The inspiration for this project is from a UCTRONICS Pi Rack that [Jeff Geerling
 - The following steps make are run with the pi user account in the home directory. If running as a different user or location other than /home/pi, you will need to adjust the paths used in this document.
 - The instructions below are for verbose logging, which may result in large files that may cause the disk space to fill up and/or cause excessive writes. If this behavior is not desired, remove the "-v" flag from the launcher.sh file.
 - To capture all errors and output, with or without logging turned on, you may change the line in crontab to "sh /home/pi/pi_status/display/launcher.sh 2>>/home/pi/pi_status/display/logs/cron_err.txt 1>/home/pi/pi_status/display/logs/cron_log.txt"
+- This script was originally written and tested in Raspbian Bullseye. There are significant changes in Raspbian Bookworm for the execution of Python code. The steps reflect the changes to allow it to run in Raspbian Bookworm.
+
+### Prerequisites
+
+- Raspberry Pi device running Raspbian Bullseye or Bookworm (Lite or Full)
+
+- OLED and switch connected to the Raspberry Pi header as indicated in the wiring table above.
+
+- Username and Password for the Raspberry Pi (If the user is not Pi, you will need to edit the scripts and commands!)
+
+- Ensure that the diskspace has been expanded.
+
+  - Run lsblk, if the partitions do not fill the drive, run "sudo raspi-config" to expand the filesystem
+
+    ```shell
+    pi@PiHome:~ $ lsblk
+    NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+    sda      8:0    0 119.2G  0 disk
+    ├─sda1   8:1    0   512M  0 part /boot/firmware
+    └─sda2   8:2    0 118.7G  0 part /
+    ```
+
+- Get the latest updates by running the following commands
+
+  ```shell
+  sudo apt update
+  sudo apt full-upgrade
+  sudo apt clean
+  # sudo rpi-update
+  # sudo reboot now
+  ```
+
+- Enable I2C interface
+
+  ```shell
+  sudo raspi-config
+  ```
+
+- Install I2C Tools
+
+  ```shell
+  sudo apt install i2c-tools
+  ```
+
+- Reboot the Raspberry Pi
+
+  ```shell
+  sudo reboot now
+  ```
+
+  
 
 ### Installation Steps ###
 
-1. Install Required Libraries (See [https://learn.adafruit.com/monochrome-oled-breakouts/python-setup](https://learn.adafruit.com/monochrome-oled-breakouts/python-setup))
-	- sudo pip3 install adafruit-blinka
-	- sudo pip3 install adafruit-circuitpython-ssd1306
-2. Clone the files from GitHub
-	- git clone https://github.com/richteel/pi_status.git
-3. Run the script on reboot
-	- sudo crontab -e
-	- Add the following line to the end of the file<br />@reboot sh /home/pi/pi\_status/display/launcher.sh
-5. Run the statement in the crontab to make certain that all is fine
-	- sh /home/pi/pi\_status/display/launcher.sh
-6. Reboot to see if all is working as expected
-	- sudo reboot now
+1. Verify that the OLED display is found using i2cdetect. You should see the LCD assigned to address 3C.
+
+  ```shell
+  pi@PiHome:~ $ i2cdetect -y 1
+  	 0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
+  00:                         -- -- -- -- -- -- -- --
+  10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+  20: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+  30: -- -- -- -- -- -- -- -- -- -- -- -- 3c -- -- --
+  40: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+  50: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+  60: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+  70: -- -- -- -- -- -- -- --
+  ```
+
+2. Verify that Python 3 is installed
+
+  ```shell
+  pi@PiHome:~ $ python
+  Python 3.11.2 (main, Nov 30 2024, 21:22:50) [GCC 12.2.0] on linux
+  Type "help", "copyright", "credits" or "license" for more information.
+  >>> quit()
+  pi@PiHome:~ $
+  ```
+
+3. Install required libraries (See [https://learn.adafruit.com/monochrome-oled-breakouts/python-setup](https://learn.adafruit.com/monochrome-oled-breakouts/python-setup))
+  *Use the commands for your operating system*
+
+  - Raspbian Bullseye
+
+    ```shell
+    sudo pip3 install adafruit-blinka
+    sudo pip3 install adafruit-circuitpython-ssd1306
+    ```
+
+  - Raspbian Bookworm
+
+    ```shell
+    sudo apt install python3-pip
+    sudo apt install python3-venv
+    # sudo apt autoremove
+    cd ~
+    python3 -m venv env --system-site-packages
+    source env/bin/activate
+    pip3 install --upgrade adafruit-python-shell
+    wget https://raw.githubusercontent.com/adafruit/Raspberry-Pi-Installer-Scripts/master/raspi-blinka.py
+    sudo -E env PATH=$PATH python3 raspi-blinka.py
+    
+    # Raspberry Pi Reboots
+    
+    python3 -m venv env --system-site-packages && source env/bin/activate && pip3 install adafruit-circuitpython-ssd1306
+    pip3 install psutil
+    sudo apt install python3-pil
+    sudo apt install python3-numpy
+    ```
+
+4. Install Git
+
+  ```shell
+  sudo apt install git
+  ```
+
+5. Clone the files from GitHub
+
+  ```shell
+  cd ~
+  git clone https://github.com/richteel/pi_status.git
+  ```
+
+6. Reboot the Raspberry Pi
+
+  ```shell
+  sudo reboot now
+  ```
+
+7. 
+
+8. 
+
+9. 
+
+10. Install Required Libraries (See [https://learn.adafruit.com/monochrome-oled-breakouts/python-setup](https://learn.adafruit.com/monochrome-oled-breakouts/python-setup))
+
+  - sudo pip3 install adafruit-blinka
+  - sudo pip3 install adafruit-circuitpython-ssd1306
+
+11. Clone the files from GitHub
+   - git clone https://github.com/richteel/pi_status.git
+
+12. Run the script on reboot
+   - sudo crontab -e
+   - Add the following line to the end of the file<br />@reboot sh /home/pi/pi\_status/display/launcher.sh
+
+13. Run the statement in the crontab to make certain that all is fine
+   - sh /home/pi/pi\_status/display/launcher.sh
+
+14. Reboot to see if all is working as expected
+   - sudo reboot now
 
 ## Notes on the Running Script ##
 You may want to stop the script or view the output of the script. First you will need to know the PID of the running script. Run the following to find the PID
@@ -225,8 +362,8 @@ Here are some things to try to determine what may be an issue if the display or 
 
 1. Display not working and "ValueError: No I2C device at address: 0x3c" is shown in the cron_erros.txt log file 
 	- Open a terminal and type the following command:<br />
-i2cdetect -y 1<br /><br />
-If you see the following output, check your wiring to the display as the display was not found on the I2C bus.<br />
+	i2cdetect -y 1<br /><br />
+	If you see the following output, check your wiring to the display as the display was not found on the I2C bus.<br />
 <pre><span style="color: green;">pi@pi-four</span>:<span style="color: blue;">~ $</span> i2cdetect -y 1
      0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
 00:                         -- -- -- -- -- -- -- --
