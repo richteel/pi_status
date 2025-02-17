@@ -91,7 +91,7 @@ The inspiration for this project is from a UCTRONICS Pi Rack that [Jeff Geerling
   - Run lsblk, if the partitions do not fill the drive, run "sudo raspi-config" to expand the filesystem
 
     ```shell
-    pi@PiHome:~ $ lsblk
+    pi@pi-two:~ $ lsblk
     NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
     sda      8:0    0 119.2G  0 disk
     ├─sda1   8:1    0   512M  0 part /boot/firmware
@@ -133,7 +133,7 @@ The inspiration for this project is from a UCTRONICS Pi Rack that [Jeff Geerling
 1. Verify that the OLED display is found using i2cdetect. You should see the LCD assigned to address 3C.
 
   ```shell
-  pi@PiHome:~ $ i2cdetect -y 1
+  pi@pi-two:~ $ i2cdetect -y 1
   	 0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f
   00:                         -- -- -- -- -- -- -- --
   10: -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -148,11 +148,11 @@ The inspiration for this project is from a UCTRONICS Pi Rack that [Jeff Geerling
 2. Verify that Python 3 is installed
 
   ```shell
-  pi@PiHome:~ $ python
+  pi@pi-two:~ $ python
   Python 3.11.2 (main, Nov 30 2024, 21:22:50) [GCC 12.2.0] on linux
   Type "help", "copyright", "credits" or "license" for more information.
   >>> quit()
-  pi@PiHome:~ $
+  pi@pi-two:~ $
   ```
 
 3. Install required libraries (See [https://learn.adafruit.com/monochrome-oled-breakouts/python-setup](https://learn.adafruit.com/monochrome-oled-breakouts/python-setup))
@@ -205,29 +205,69 @@ The inspiration for this project is from a UCTRONICS Pi Rack that [Jeff Geerling
   sudo reboot now
   ```
 
-7. 
+7. Make the launcher script executable
 
-8. 
+  ```shell
+  chmod 755 /home/pi/pi_status/display/launcher.sh
+  ```
 
-9. 
+8. If running Raspbian Bullseye, edit launcher.sh by commenting the Bookworm line and uncommenting the Bullseye line.
 
-10. Install Required Libraries (See [https://learn.adafruit.com/monochrome-oled-breakouts/python-setup](https://learn.adafruit.com/monochrome-oled-breakouts/python-setup))
+9. Test the script to make certain it works as expected.
 
-  - sudo pip3 install adafruit-blinka
-  - sudo pip3 install adafruit-circuitpython-ssd1306
+  ```shell
+  /home/pi/pi_status/display/launcher.sh
+  ```
 
-11. Clone the files from GitHub
-   - git clone https://github.com/richteel/pi_status.git
+10. If the code runs properly, you should see the OLED display and switch LED light up. The OLED will cycle information on the display. The terminal window will display information as shown in this sample.
 
-12. Run the script on reboot
-   - sudo crontab -e
-   - Add the following line to the end of the file<br />@reboot sh /home/pi/pi\_status/display/launcher.sh
+  ```shell
+  pi@pi-two:~ $ /home/pi/pi_status/display/launcher.sh
+  2025-02-17 17:43:54     Failed to obtain IP Address for wlan0
+  2025-02-17 17:43:54     Starting Pi Status
+  2025-02-17 17:43:54     Starting Pi Status
+  2025-02-17 17:43:54     Logging = True
+  2025-02-17 17:43:54     Logging Verbose = True
+  2025-02-17 17:43:54     Pi Status       Version 0.2     -1
+  2025-02-17 17:44:04     Failed to obtain IP Address for wlan0
+  2025-02-17 17:44:04     IP: 192.168.0.228       NAME    pi-two  -1
+  ```
 
-13. Run the statement in the crontab to make certain that all is fine
-   - sh /home/pi/pi\_status/display/launcher.sh
+11. Press &lt;Ctrl&gt; + c to exit the script.
 
-14. Reboot to see if all is working as expected
-   - sudo reboot now
+12. Add a Cron Job to run the script on startup.
+
+   ```shell
+   sudo crontab -e
+   ```
+
+   If prompted, select your editor of choice. I selected Nano in this example.
+
+   ```shell
+   pi@pi-two:~ $ sudo crontab -e
+   no crontab for root - using an empty one
+   
+   Select an editor.  To change later, run 'select-editor'.
+     1. /bin/nano        <---- easiest
+     2. /usr/bin/vim.tiny
+     3. /bin/ed
+   
+   Choose 1-3 [1]: 1
+   ```
+
+   Add the following line to the end of the file.
+
+   ```shell
+   @reboot sh /home/pi/pi_status/display/launcher.sh
+   ```
+
+13. Reboot to see if all is working as expected
+
+   ```shell
+   sudo reboot now
+   ```
+
+14. On reboot, make certain that the OLED display is showing information as expected and the power switch LED is lit.
 
 ## Notes on the Running Script ##
 You may want to stop the script or view the output of the script. First you will need to know the PID of the running script. Run the following to find the PID
